@@ -1,0 +1,16 @@
+PUBL.363.01 - Cyber Security Policy and Law
+
+Choose one of the following questions to explore in-depth using class materials and any other relevant sources or perspectives (external sources are welcomed) and write a short essay (600-800 words per question references excluded).
+
+**In all written assignments, you should:**  
+Put your name and date in a running header  
+Use APA-citation style  
+Use double-spacing, 12pt Times New Roman front, and 1-inch margins  
+Comply with length limits
+
+Question 1: The prevalence of cybersecurity incidents suggests failures that extend beyond mere technical flaws. Some of these failures are often attributed to the dominant logics of the technology industry, and insufficient economic incentives for strong security. Private companies, especially large tech providers, occupy the paradoxical role of essential "Guardians" of critical data and infrastructure, while simultaneously acting as potential single points of failure and sources of systemic risk.  
+Evaluate how the speed and scale of the tech industry’s development model contribute to system complexity and vulnerability. Then, propose and justify a set of specific governmental policies designed to address these fundamental structural issues and align the private sector's security incentives with the public good of collective cyber resilience.
+
+Question 2: Routine Activity Theory (RAT) suggests that a cyber incident requires the convergence of a motivated actor, a suitable target, and the absence of a capable guardian. This framework shifts focus away from purely technical vulnerabilities and onto social and organizational factors. Analyze a recent (~1 year old), cyber incident (e.g., a major ransomware attack, a significant data leak caused by an 'accidental insider,' or a hacktivist event). Using the lens of Routine Activity Theory and the "human factor" readings, demonstrate how this incident occurred despite available technical defenses. Based on your analysis, propose and justify one non-technical policy or organizational strategy that governments or organizations could implement to more effectively disrupt the convergence of the three elements of the RAT framework. In your answer be as specific as possible avoiding broad suggestions such as, for example, “training” and Multi-factor authentication”.
+
+	Question 3: Technological advancements in surveillance, AI, and data collection present both opportunities and challenges. In the essay, (1) Discuss the key dimensions of this debate, addressing their implications for individuals, businesses, and governments. (2) Compare regulatory approaches by examining the differences between U.S. privacy laws and the EU GDPR. Alternatively to (2), explore variations in privacy regulations across two different U.S. states, such as the California Consumer Privacy Act (CCPA) and other state-level initiatives. Critically assess the strengths and weaknesses of these regulatory frameworks in mitigating risks while enabling the benefits of emerging technologies.

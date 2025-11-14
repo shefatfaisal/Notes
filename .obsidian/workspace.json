@@ -4,39 +4,24 @@
     "type": "split",
     "children": [
       {
-        "id": "fcc42b7791d3fb2f",
+        "id": "a74a38b75a3647fe",
         "type": "tabs",
         "children": [
           {
-            "id": "cc367e4889b0f94b",
+            "id": "c965ace6ac4830c0",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "python/midterm 2.md",
+                "file": "csec140/System security and operating systems.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "midterm 2"
-            }
-          },
-          {
-            "id": "472a5f854599ce18",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Friendships.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Friendships"
+              "title": "System security and operating systems"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -68,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "nmap",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -184,29 +169,55 @@
       "bases:Create new base": false
     }
   },
-  "active": "472a5f854599ce18",
+  "active": "c965ace6ac4830c0",
   "lastOpenFiles": [
-    "python/midterm 2.md",
-    "Friendships.md",
+    "csec140/Photoes/Pasted image 20251114023809.png",
+    "csec140/Photoes/Pasted image 20251114023747.png",
+    "csec140/Photoes/Pasted image 20251114023527.png",
+    "csec140/wireless networks and security.md",
+    "Java/OOP.md",
+    "csec140/System security and operating systems.md",
+    "csec140/Identification and authentication.md",
+    "csec140/Compliance, Law and Regulations.md",
+    "csec140/Photoes/Pasted image 20251111114838.png",
+    "network security/nmap.md",
+    "csec140/Photoes/Pasted image 20251110232018.png",
+    "2025-10-12.md",
+    "Docker.md",
+    "IRSEC.md",
+    "Reflection essay.md",
     "csec140/Networking protocole(Week5).md",
-    "Untitled",
-    "python",
+    "csec140/Authorization, Access Control, and Accountability.md",
     "publ/publ 365.md",
-    "publ",
-    "ctfprimer/ctfprimer.md",
-    "ctfprimer",
-    "phil study guide",
-    "Networking protocole(Week5).md",
-    "Welcome.md",
-    "Untitled 5",
-    "csec140",
-    "Untitled 3",
-    "Untitled 2",
-    "Untitled 2.md",
-    "Untitled 1.md",
-    "Untitled 1.canvas",
+    "carrers/Companies.md",
+    "phil study guide/moralism and realism.md",
+    "Wireshark.md",
+    "csec140/vpn.md",
+    "csec140/Traceroute.md",
+    "Networking/NAT and Gateway.md",
+    "Networking",
+    "network security/free code camp org.md",
+    "Untitled.md",
+    "Java/Photoes/Pasted image 20251027093106.png",
+    "Java/Photoes",
+    "Photoes/Pasted image 20251025123008.png",
+    "Photoes/Pasted image 20251025121356.png",
+    "Photoes/Pasted image 20251025120517.png",
+    "Photoes/Pasted image 20251025115854.png",
+    "Photoes/Pasted image 20251024201028.png",
+    "Photoes",
+    "Wireshark",
+    "Wireshark",
+    "Wireshark",
+    "btlo/Tools.md",
+    "phil study guide/appidah's viw.md",
+    "csec140/Compliance, Laws and Regulation.md",
+    "Reflection essay",
+    "btlo",
+    "CCDC/LAMP.md",
+    "CCDC",
+    "network security",
     "Untitled.canvas",
-    "2025-09-22.md",
-    "Untitled.base"
+    "Untitled 1.canvas"
   ]
 }

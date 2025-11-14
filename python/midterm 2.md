@@ -78,7 +78,7 @@ Here’s the Python-centric idea:
 - **Deep equality (recursive view)**  
     Looks through **all nested levels** and compares **only values recursively** not references  
     Inner objects don’t need to be the _same objects_—they just need to have the _same contents_
-    just check same value and type doesnot care references
+    just check **same value and type** doesnot care references
 **Slicing**
 
 	start, stop,step
@@ -103,4 +103,8 @@ s[4::-1]    # from index 4 down to start
 **sets**
 	a hash function is a one-way function that, given an arbitrary input value, produces a number as output
 	**You cant chage the value means inserting or removing while iterating its gonna crash and get runtime error**
+
+
+**Hash**: there is a built in funciton in python named hash
+hash function is an system time function that means its gonna be same for the same runtime. if the runtime ends hash changes it output for the same value
 	
