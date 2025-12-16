@@ -197,7 +197,7 @@ So yes, your assumption in your example was right: solid line means it extends t
 
 
 **Abstract Calss**
-we cant create or instantiated a new instance for abstract class
+we can't create or instantiated a new instance for abstract class
 
 
 
