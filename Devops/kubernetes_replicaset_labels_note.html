@@ -1,0 +1,117 @@
+
+<style>
+  .note { padding: 1.5rem 0; font-family: var(--font-mono); }
+  .section { margin-bottom: 1.5rem; }
+  .section-title { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; font-family: var(--font-sans); }
+  .yaml-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem 1.25rem; font-size: 13px; line-height: 1.8; }
+  .c-dim { color: var(--color-text-tertiary); }
+  .c-key { color: #185FA5; }
+  .c-val { color: #3B6D11; }
+  .c-comment { color: var(--color-text-tertiary); font-style: italic; }
+  .c-highlight { color: #BA7517; font-weight: 500; }
+  .annotation-row { display: flex; gap: 1rem; margin-top: 1.5rem; }
+  .annotation-card { flex: 1; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; margin-bottom: 6px; font-family: var(--font-sans); }
+  .badge-1 { background: #E6F1FB; color: #0C447C; }
+  .badge-2 { background: #FAEEDA; color: #633806; }
+  .badge-3 { background: #EAF3DE; color: #27500A; }
+  .card-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin: 4px 0; font-family: var(--font-sans); }
+  .card-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; font-family: var(--font-sans); }
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1.5rem 0; }
+  .rule-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-family: var(--font-sans); font-size: 13px; }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-icon { font-size: 14px; margin-top: 1px; min-width: 18px; }
+  .rule-text { color: var(--color-text-primary); line-height: 1.5; }
+  .rule-text strong { font-weight: 500; }
+  .cmd-block { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; font-size: 12.5px; line-height: 2; }
+  .cmd-comment { color: var(--color-text-tertiary); }
+  .cmd-main { color: var(--color-text-primary); }
+</style>
+
+<div class="note">
+  <div class="section">
+    <div class="section-title">ReplicaSet manifest — annotated</div>
+    <div class="yaml-block">
+      <div><span class="c-key">apiVersion</span>: <span class="c-val">apps/v1</span></div>
+      <div><span class="c-key">kind</span>: <span class="c-val">ReplicaSet</span></div>
+      <div><span class="c-key">metadata</span>:</div>
+      <div>&nbsp;&nbsp;<span class="c-key">name</span>: <span class="c-val">my-app-rs</span></div>
+      <div>&nbsp;&nbsp;<span class="c-key">labels</span>:</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-highlight">app: my-app</span>&nbsp;&nbsp;<span class="c-comment"># [1] tag ON the RS object itself</span></div>
+      <div><span class="c-key">spec</span>:</div>
+      <div>&nbsp;&nbsp;<span class="c-key">replicas</span>: <span class="c-val">3</span></div>
+      <div>&nbsp;&nbsp;<span class="c-key">selector</span>:</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">matchLabels</span>:</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-highlight">app: my-app</span>&nbsp;&nbsp;<span class="c-comment"># [2] RS's search filter — watches pods with this label</span></div>
+      <div>&nbsp;&nbsp;<span class="c-key">template</span>:</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">metadata</span>:</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">labels</span>:</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-highlight">app: my-app</span>&nbsp;&nbsp;<span class="c-comment"># [3] label stamped on every pod created</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">spec</span>:</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">containers</span>:</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-dim">- name: my-app</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-dim">image: nginx:1.25</span></div>
+    </div>
+  </div>
+
+  <div class="annotation-row">
+    <div class="annotation-card">
+      <span class="badge badge-1">[1] metadata.labels</span>
+      <div class="card-title">Tag on the RS object</div>
+      <div class="card-desc">Optional. Lets other objects (like a Service) find this RS. Does not affect pod creation.</div>
+    </div>
+    <div class="annotation-card">
+      <span class="badge badge-2">[2] selector.matchLabels</span>
+      <div class="card-title">RS's search filter</div>
+      <div class="card-desc">RS counts pods with this label. Too few → create. Too many → delete. Must match [3].</div>
+    </div>
+    <div class="annotation-card">
+      <span class="badge badge-3">[3] template.labels</span>
+      <div class="card-title">Stamp on every new pod</div>
+      <div class="card-desc">Baked into each pod at birth. Must match [2] — Kubernetes rejects manifest if they differ.</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-title">Key rules to remember</div>
+    <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 0.25rem 1rem;">
+      <div class="rule-row">
+        <div class="rule-icon">⚠</div>
+        <div class="rule-text"><strong>[2] and [3] must always match.</strong> If they differ, Kubernetes rejects the manifest immediately.</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon">⚠</div>
+        <div class="rule-text"><strong>Standalone pods with matching labels get adopted.</strong> RS counts them as its own replicas — can cause unexpected behavior.</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon">i</div>
+        <div class="rule-text"><strong>In practice, use Deployments, not bare ReplicaSets.</strong> A Deployment wraps an RS and adds rolling updates + rollback.</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-icon">i</div>
+        <div class="rule-text"><strong>[1] metadata.labels is optional.</strong> The RS works fine without it — only needed when other objects need to target the RS.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-title">Useful commands</div>
+    <div class="cmd-block">
+      <div><span class="cmd-comment"># apply manifest</span></div>
+      <div class="cmd-main">kubectl apply -f replicaset.yml</div>
+      <div><span class="cmd-comment"># check RS and pods</span></div>
+      <div class="cmd-main">kubectl get rs</div>
+      <div class="cmd-main">kubectl get pods</div>
+      <div><span class="cmd-comment"># scale up or down</span></div>
+      <div class="cmd-main">kubectl scale rs my-app-rs --replicas=5</div>
+      <div><span class="cmd-comment"># inspect events</span></div>
+      <div class="cmd-main">kubectl describe rs my-app-rs</div>
+      <div><span class="cmd-comment"># delete RS and its pods</span></div>
+      <div class="cmd-main">kubectl delete rs my-app-rs</div>
+    </div>
+  </div>
+</div>

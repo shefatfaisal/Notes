@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSPF Mental Models</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e28;
+    --border: rgba(255,255,255,0.07);
+    --text: #e8e6df;
+    --muted: #7a7870;
+    --teal: #2dd4a0;
+    --teal-dim: rgba(45,212,160,0.12);
+    --amber: #f5a623;
+    --amber-dim: rgba(245,166,35,0.12);
+    --coral: #f06060;
+    --coral-dim: rgba(240,96,96,0.12);
+    --purple: #a78bfa;
+    --purple-dim: rgba(167,139,250,0.12);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96,165,250,0.12);
+    --green: #6ee7b7;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', Georgia, serif;
+    font-size: 15px;
+    line-height: 1.75;
+    padding: 40px 20px 80px;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 60px 0 50px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 60px;
+  }
+
+  .header-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .header h1 span { color: var(--teal); }
+
+  .header p {
+    color: var(--muted);
+    font-size: 14px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 64px;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  .tag-teal { background: var(--teal-dim); color: var(--teal); }
+  .tag-amber { background: var(--amber-dim); color: var(--amber); }
+  .tag-coral { background: var(--coral-dim); color: var(--coral); }
+  .tag-purple { background: var(--purple-dim); color: var(--purple); }
+  .tag-blue { background: var(--blue-dim); color: var(--blue); }
+
+  .analogy {
+    background: var(--bg3);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .analogy strong { color: var(--teal); font-style: normal; }
+
+  /* Code blocks */
+  .codeblock {
+    background: #080a0f;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin: 12px 0;
+    color: #c8c5bb;
+  }
+
+  .codeblock .c-teal { color: var(--teal); }
+  .codeblock .c-amber { color: var(--amber); }
+  .codeblock .c-coral { color: var(--coral); }
+  .codeblock .c-purple { color: var(--purple); }
+  .codeblock .c-muted { color: var(--muted); }
+  .codeblock .c-blue { color: var(--blue); }
+
+  /* Grid layouts */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+  }
+
+  @media (max-width: 600px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* Router type cards */
+  .router-card {
+    border-radius: 10px;
+    padding: 18px;
+    border: 1px solid var(--border);
+  }
+
+  .router-card .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 6px;
+  }
+
+  .router-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .router-card p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .rc-teal { background: var(--teal-dim); border-color: rgba(45,212,160,0.2); }
+  .rc-teal .label, .rc-teal h3 { color: var(--teal); }
+
+  .rc-amber { background: var(--amber-dim); border-color: rgba(245,166,35,0.2); }
+  .rc-amber .label, .rc-amber h3 { color: var(--amber); }
+
+  .rc-coral { background: var(--coral-dim); border-color: rgba(240,96,96,0.2); }
+  .rc-coral .label, .rc-coral h3 { color: var(--coral); }
+
+  .rc-purple { background: var(--purple-dim); border-color: rgba(167,139,250,0.2); }
+  .rc-purple .label, .rc-purple h3 { color: var(--purple); }
+
+  .rc-blue { background: var(--blue-dim); border-color: rgba(96,165,250,0.2); }
+  .rc-blue .label, .rc-blue h3 { color: var(--blue); }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 12px 0;
+  }
+
+  th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Rule boxes */
+  .rule {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px;
+    background: var(--bg3);
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .rule-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--teal);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 28px;
+  }
+
+  .rule-text {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .rule-text strong {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    color: #fff;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* Warning/note boxes */
+  .note {
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 14px 0;
+    line-height: 1.65;
+  }
+
+  .note-warn {
+    background: rgba(245,166,35,0.08);
+    border: 1px solid rgba(245,166,35,0.2);
+    color: #c8a96e;
+  }
+
+  .note-warn strong { color: var(--amber); }
+
+  .note-info {
+    background: rgba(96,165,250,0.08);
+    border: 1px solid rgba(96,165,250,0.2);
+    color: #8cb8e0;
+  }
+
+  .note-info strong { color: var(--blue); }
+
+  /* Divider */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* Key insight box */
+  .insight {
+    background: var(--teal-dim);
+    border: 1px solid rgba(45,212,160,0.25);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    font-size: 14px;
+    color: #a8e8d4;
+    line-height: 1.7;
+  }
+
+  .insight strong { color: var(--teal); font-family: 'Syne', sans-serif; }
+
+  /* Message type steps */
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .step-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-body { font-size: 14px; line-height: 1.6; }
+  .step-body strong { color: #fff; font-family: 'Syne', sans-serif; font-size: 14px; }
+
+  /* Cost formula */
+  .formula {
+    text-align: center;
+    padding: 24px;
+    background: var(--bg3);
+    border-radius: 10px;
+    margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .formula .big {
+    font-size: 22px;
+    color: #fff;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .formula .sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* TOC */
+  .toc {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 60px;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+
+  .toc-item:hover {
+    border-color: rgba(45,212,160,0.3);
+    color: var(--teal);
+    background: var(--teal-dim);
+  }
+
+  .toc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--teal);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 500px) { .toc { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-label">NSSA 241 · Week 11 · Mental Models</div>
+    <h1>OSPF — <span>Complete</span><br>Field Notes</h1>
+    <p>every concept · every analogy · one place</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <a class="toc-item" href="#ospf"><span class="toc-num">01</span> What is OSPF</a>
+    <a class="toc-item" href="#lsdb"><span class="toc-num">02</span> LSDB & LSAs</a>
+    <a class="toc-item" href="#areas"><span class="toc-num">03</span> Areas & Hierarchy</a>
+    <a class="toc-item" href="#rules"><span class="toc-num">04</span> Area Rules</a>
+    <a class="toc-item" href="#routers"><span class="toc-num">05</span> Router Types</a>
+    <a class="toc-item" href="#lsatypes"><span class="toc-num">06</span> LSA Types</a>
+    <a class="toc-item" href="#messages"><span class="toc-num">07</span> Message Types</a>
+    <a class="toc-item" href="#hello"><span class="toc-num">08</span> Hello Packet Deep Dive</a>
+    <a class="toc-item" href="#networktypes"><span class="toc-num">09</span> Network Types</a>
+    <a class="toc-item" href="#cost"><span class="toc-num">10</span> Cost & Metric</a>
+    <a class="toc-item" href="#bandwidth"><span class="toc-num">11</span> Bandwidth Explained</a>
+    <a class="toc-item" href="#asn"><span class="toc-num">12</span> AS & ASN</a>
+  </div>
+
+  <!-- 01 WHAT IS OSPF -->
+  <div class="section" id="ospf">
+    <div class="section-label">concept 01</div>
+    <div class="section-title">What is OSPF?</div>
+
+    <div class="card">
+      <div class="card-title">
+        The one-line definition
+        <span class="tag tag-teal">IGP</span>
+        <span class="tag tag-amber">Link-State</span>
+      </div>
+      <p>OSPF is a routing protocol that runs <em>inside</em> an organization's network. Every router shares information about its own links with every other router in the same area, building a shared map of the topology, then independently runs Dijkstra's algorithm to find the best path to every destination.</p>
+      <div class="analogy">
+        <strong>Mental model:</strong> Every router is a city that posts its own road map on a public bulletin board. Every other city reads every posted map. Each city then independently calculates its own best GPS route to every other city using all the maps combined.
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">IGP — Interior Gateway Protocol</div>
+        <p style="font-size:13px;color:var(--muted)">Runs <em>inside</em> one organization's network (one Autonomous System). Knows the internal topology in full detail.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">EGP — Exterior Gateway Protocol</div>
+        <p style="font-size:13px;color:var(--muted)">Runs <em>between</em> organizations (BGP). Knows only summaries — not internal topology of other networks.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 02 LSDB -->
+  <div class="section" id="lsdb">
+    <div class="section-label">concept 02</div>
+    <div class="section-title">LSDB — Link State Database</div>
+
+    <div class="card">
+      <div class="card-title">What it is <span class="tag tag-teal">per router, per area</span></div>
+      <p>Every OSPF router maintains its own LSDB — a collection of Link State Advertisements (LSAs) describing every router and link in the area. All routers in the same area end up with <em>identical</em> copies through flooding.</p>
+      <div class="codeblock">
+<span class="c-teal">Area 1 — every router holds identical copy:</span>
+  LSA from R1: "I have these interfaces → 10.1.1.1, 10.1.2.1"
+  LSA from R2: "I have these interfaces → 10.1.1.2, 10.1.3.1"
+  LSA from R3: "I have these interfaces → 10.1.2.2, 10.1.3.2"
+
+<span class="c-muted">↓ fed into Dijkstra's algorithm ↓</span>
+
+  Routing table for R1:
+  10.1.3.0/24 → via R2, cost 2
+  10.1.2.0/24 → via R3, cost 1
+      </div>
+    </div>
+
+    <div class="insight">
+      <strong>Key insight:</strong> The LSDB is not one shared database floating in the cloud. It is a copy stored locally on every single router. Flooding exists to keep all those copies synchronized. If even one router has a different copy, Dijkstra produces different results and routing inconsistencies occur.
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 03 AREAS -->
+  <div class="section" id="areas">
+    <div class="section-label">concept 03</div>
+    <div class="section-title">Areas & The Hierarchy Problem</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="color:var(--coral)">Flat network — the problem</div>
+        <p style="font-size:13px;color:var(--muted)">Every router knows every other router. One link failure triggers Dijkstra recalculation on <em>every</em> router in the entire network. Flooding spreads everywhere. LSDB grows without bound.</p>
+        <div class="analogy" style="border-color:var(--coral)">Like a village where every pothole gets announced to every person simultaneously — fine at 50 people, catastrophic at 50,000.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--teal)">Hierarchical (areas) — the fix</div>
+        <p style="font-size:13px;color:var(--muted)">Routers only know their own area's full topology. A link failure in Area 1 triggers recalculation <em>only</em> in Area 1. Area 2 and Area 3 are completely unaffected.</p>
+        <div class="analogy">Like a city divided into districts — a broken road in downtown only needs to be announced to downtown residents, not the entire country.
+        </div>
+      </div>
+    </div>
+
+    <div class="note note-info">
+      <strong>The blast radius rule:</strong> Dijkstra runs per area. Flooding stops at area borders. A flapping link in Area 3 can never force Area 1 routers to recalculate. This containment is the entire reason areas exist.
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 04 AREA RULES -->
+  <div class="section" id="rules">
+    <div class="section-label">concept 04</div>
+    <div class="section-title">The Three Unbreakable Area Rules</div>
+
+    <div class="rule">
+      <div class="rule-num">1</div>
+      <div class="rule-text">
+        <strong>Area 0 (backbone) must always exist</strong>
+        Area 0 is the mandatory central hub. There is no OSPF without it. It is the highway that all inter-area traffic must pass through.
+      </div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-num">2</div>
+      <div class="rule-text">
+        <strong>Every other area must connect directly to Area 0</strong>
+        Area 1 cannot talk to Area 3 directly. Traffic must flow Area 1 → Area 0 → Area 3. This creates a mandatory star topology with Area 0 at the center. This prevents routing loops.
+      </div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-num">3</div>
+      <div class="rule-text">
+        <strong>Area 0 must be contiguous — no splits</strong>
+        All backbone routers must be physically connected to each other. A split backbone means the two halves cannot synchronize their LSDBs — routing collapses. Fix: virtual links (a workaround, not a design goal).
+      </div>
+    </div>
+
+    <div class="codeblock">
+<span class="c-teal">Legal topology (star):</span>
+  Area 1 ──ABR──┐
+  Area 2 ──ABR──┤── Area 0 (backbone)
+  Area 3 ──ABR──┘
+
+<span class="c-coral">Illegal topology (no direct area-to-area links):</span>
+  Area 1 ── Area 2 ── Area 3   ← Area 2 cannot reach Area 0 here
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 05 ROUTER TYPES -->
+  <div class="section" id="routers">
+    <div class="section-label">concept 05</div>
+    <div class="section-title">Router Types — Who Does What</div>
+
+    <p style="color:var(--muted);font-size:14px;margin-bottom:20px">Router type is determined entirely by <em>where its interfaces sit</em>, not by any manual configuration.</p>
+
+    <div class="grid-2">
+      <div class="router-card rc-teal">
+        <div class="label">Internal router</div>
+        <h3>All interfaces in one non-backbone area</h3>
+        <p>The most common router. Only knows its own area. Lightest processing load. Generates Type 1 LSA only.</p>
+        <div class="analogy" style="border-color:var(--teal);margin-top:10px">Employee who only knows their department floor plan.</div>
+      </div>
+
+      <div class="router-card rc-blue">
+        <div class="label">Backbone router</div>
+        <h3>All interfaces in Area 0 only</h3>
+        <p>Keeps the central highway running. Handles inter-area forwarding. Generates Type 1 LSA for Area 0.</p>
+        <div class="analogy" style="border-color:var(--blue);margin-top:10px">Highway interchange worker — manages the road everyone uses.</div>
+      </div>
+
+      <div class="router-card rc-amber">
+        <div class="label">ABR — Area Border Router</div>
+        <h3>Interfaces in Area 0 + at least one other area</h3>
+        <p>The most critical router type. Maintains <em>two separate LSDBs</em>. Runs Dijkstra twice. Generates Type 3 Summary LSAs — the only way routes cross area boundaries. It is a <strong>translator, not a mixer</strong>.</p>
+        <div class="analogy" style="border-color:var(--amber);margin-top:10px">Regional manager who summarizes their region to HQ without leaking internal details.</div>
+      </div>
+
+      <div class="router-card rc-coral">
+        <div class="label">ASBR — AS Boundary Router</div>
+        <h3>One interface in OSPF AS, one in external AS</h3>
+        <p>The edge of your OSPF world. Connects to BGP, EIGRP, RIP, or static routes. Redistributes external routes into OSPF as Type 5 External LSAs.</p>
+        <div class="analogy" style="border-color:var(--coral);margin-top:10px">Customs officer — everything entering or leaving the country passes through them.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 06 LSA TYPES -->
+  <div class="section" id="lsatypes">
+    <div class="section-label">concept 06</div>
+    <div class="section-title">LSA Types — The Data Records</div>
+
+    <div class="analogy">LSAs are the <strong>books in the library</strong>. They live permanently in the LSDB. Each type is a different category of book describing a different aspect of the network.</div>
+
+    <table>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Who generates</th>
+        <th>What it describes</th>
+        <th>Scope</th>
+      </tr>
+      <tr>
+        <td><span class="tag tag-teal">1</span></td>
+        <td>Router LSA</td>
+        <td>Every router</td>
+        <td>Its own interfaces & directly connected networks</td>
+        <td>Stays in area</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-blue">2</span></td>
+        <td>Network LSA</td>
+        <td>DR only (broadcast segments)</td>
+        <td>All routers attached to that broadcast segment</td>
+        <td>Stays in area</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-amber">3</span></td>
+        <td>Summary LSA</td>
+        <td>ABR only</td>
+        <td>Routes from another area — summarized, not raw topology</td>
+        <td>Injected into Area 0</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-purple">4</span></td>
+        <td>ASBR Summary</td>
+        <td>ABR</td>
+        <td>How to reach an ASBR</td>
+        <td>Crosses areas via ABR</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-coral">5</span></td>
+        <td>External LSA</td>
+        <td>ASBR only</td>
+        <td>Routes from outside the OSPF AS entirely</td>
+        <td>Floods entire AS</td>
+      </tr>
+    </table>
+
+    <div class="note note-warn">
+      <strong>Critical:</strong> Type 2 and Type 3 are the most confused pair. Type 2 never leaves its area — it describes a broadcast segment internally. Type 3 is what the ABR creates fresh to advertise that area's routes into Area 0. The ABR reads Type 2, then creates a brand new Type 3. The Type 2 itself never crosses the boundary.
+    </div>
+
+    <div class="codeblock">
+<span class="c-teal">What actually crosses an area boundary:</span>
+
+  Area 1 internal:  Type 1 (R1) + Type 1 (R2) + Type 2 (DR)
+                         ↓ ABR reads all of these ↓
+  ABR generates → Type 3 Summary LSA → floods into Area 0
+                  "10.1.0.0/16 is reachable via me, cost 15"
+
+<span class="c-muted">The raw Type 1s and Type 2s from Area 1 NEVER enter Area 0.</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 07 MESSAGE TYPES -->
+  <div class="section" id="messages">
+    <div class="section-label">concept 07</div>
+    <div class="section-title">OSPF Message Types — The Delivery System</div>
+
+    <div class="analogy">Message types are the <strong>postal system</strong>. They are temporary — sent, received, done. They do not live in the LSDB. LSA types are the books. Message types are the delivery trucks that move books around.</div>
+
+    <div class="step">
+      <div class="step-badge tag-teal">MSG 1</div>
+      <div class="step-body">
+        <strong>Hello</strong>
+        Sent every 10 seconds (Ethernet) to multicast 224.0.0.5. Discovers neighbors, negotiates compatibility, and maintains the relationship as a heartbeat. Contains must-match fields: Hello interval, Dead interval, Area ID, Subnet mask, Auth. If any mismatch — no neighbor formed, no error shown, packet silently ignored.
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-badge tag-amber">MSG 2</div>
+      <div class="step-body">
+        <strong>DB Description</strong>
+        "Here is a catalog of what's in my LSDB." Sends LSA headers only — no full data. Like a library sending its card catalog, not the actual books.
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-badge tag-purple">MSG 3</div>
+      <div class="step-body">
+        <strong>LS Request</strong>
+        "You have these LSAs that I don't. Please send me the full versions." The router compares DB Descriptions and identifies gaps.
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-badge tag-coral">MSG 4</div>
+      <div class="step-body">
+        <strong>LS Update</strong>
+        The actual full LSA data. This is what gets stored in the LSDB. The most important message for building topology knowledge.
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-badge tag-blue">MSG 5</div>
+      <div class="step-body">
+        <strong>LS Acknowledgement</strong>
+        "I received your LS Update." Just a confirmation using LSA headers — not the full data again. OSPF uses reliable delivery so every LS Update must be acknowledged.
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 08 HELLO DEEP DIVE -->
+  <div class="section" id="hello">
+    <div class="section-label">concept 08</div>
+    <div class="section-title">Hello Packet — Deep Dive</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="color:var(--coral)">Must-match fields <span class="tag tag-coral">gatekeeper</span></div>
+        <p style="font-size:13px;color:var(--muted)">Mismatch on any of these = neighbor silently rejected.</p>
+        <ul style="font-size:13px;color:var(--muted);padding-left:18px;margin-top:8px;line-height:2">
+          <li>Hello interval (default 10s Ethernet)</li>
+          <li>Dead interval (default 4× hello = 40s)</li>
+          <li>Area ID</li>
+          <li>Subnet mask</li>
+          <li>Authentication password</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--teal)">Informational fields <span class="tag tag-teal">coordination</span></div>
+        <p style="font-size:13px;color:var(--muted)">Used to coordinate, not gatekeep.</p>
+        <ul style="font-size:13px;color:var(--muted);padding-left:18px;margin-top:8px;line-height:2">
+          <li>Router ID (who sent this Hello)</li>
+          <li>DR / BDR addresses (election info)</li>
+          <li>Router priority (used in DR election)</li>
+          <li>Neighbor list (Router IDs already seen)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">The neighbor list — why it's clever</div>
+      <p style="font-size:14px;color:var(--muted)">A Hello from R1 doesn't prove R2 can hear R1. The neighbor list solves this. R2 lists R1's Router ID in its own Hello reply. When R1 sees its own ID listed — bidirectional confirmed. This state is called <span style="color:var(--teal)">2-way</span>. Only after 2-way do routers proceed to full LSDB synchronization.</p>
+      <div class="codeblock" style="margin-top:12px">
+Step 1: R1 → Hello → R2  (neighbor list: empty)
+Step 2: R2 → Hello → R1  (neighbor list: <span class="c-teal">R1</span>) ← "I see you"
+Step 3: R1 sees its own ID → <span class="c-amber">2-way state reached</span>
+Step 4: Proceed to DB Description exchange (msgs 2-5)
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 09 NETWORK TYPES -->
+  <div class="section" id="networktypes">
+    <div class="section-label">concept 09</div>
+    <div class="section-title">Network Types</div>
+
+    <p style="color:var(--muted);font-size:14px;margin-bottom:20px">Two separate classifications — physical type (what hardware) and traffic role (how traffic uses it). They are independent.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Point-to-Point <span class="tag tag-teal">physical type</span></div>
+        <p style="font-size:13px;color:var(--muted)">Exactly two routers on the link (e.g. HDLC, leased line). No DR election needed — only one possible neighbor. Generates Type 1 only.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Broadcast Multi-Access <span class="tag tag-amber">physical type</span></div>
+        <p style="font-size:13px;color:var(--muted)">Many routers on a shared medium (Ethernet switch). DR elected to prevent N×(N-1)/2 adjacency explosion. DR generates Type 2 Network LSA for the segment.</p>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:16px">
+      <div class="card">
+        <div class="card-title">Transit network <span class="tag tag-purple">traffic role</span></div>
+        <p style="font-size:13px;color:var(--muted)">Traffic passes <em>through</em> — source and destination are elsewhere. The network is just a road. Example: link between two backbone routers.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Stub network <span class="tag tag-coral">traffic role</span></div>
+        <p style="font-size:13px;color:var(--muted)">Dead end. All traffic either originates from or is destined to addresses inside this network. Nothing just passes through. Example: office LAN with end-user PCs.</p>
+      </div>
+    </div>
+
+    <div class="note note-warn" style="margin-top:16px">
+      <strong>DR election trigger:</strong> The DR is elected on broadcast segments — not based on how many routers are in the area. An area with 100 routers on point-to-point links has zero DR elections. A single Ethernet segment with 3 routers triggers one.
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 10 COST -->
+  <div class="section" id="cost">
+    <div class="section-label">concept 10</div>
+    <div class="section-title">OSPF Metric — Cost</div>
+
+    <div class="card">
+      <div class="card-title">RFC says: "a single dimensionless metric"</div>
+      <p style="font-size:14px;color:var(--muted)">The OSPF RFC deliberately leaves cost undefined — just a number. Each vendor implements it their own way. Cisco uses interface bandwidth.</p>
+    </div>
+
+    <div class="formula">
+      <span class="big"><span style="color:var(--teal)">Cost</span> = <span style="color:var(--amber)">Reference BW</span> / <span style="color:var(--coral)">Interface BW</span></span>
+      <span class="sub">Cisco default: reference BW = 100 Mbps · cost is always an integer (minimum 1)</span>
+    </div>
+
+    <table>
+      <tr><th>Link</th><th>Speed</th><th>Formula</th><th>Cost</th></tr>
+      <tr><td>Serial T1</td><td>1.5 Mbps</td><td>100 / 1.5</td><td style="color:var(--coral)">64 — very expensive</td></tr>
+      <tr><td>Ethernet 10M</td><td>10 Mbps</td><td>100 / 10</td><td style="color:var(--amber)">10</td></tr>
+      <tr><td>Fast Ethernet</td><td>100 Mbps</td><td>100 / 100</td><td style="color:var(--teal)">1 — cheapest</td></tr>
+      <tr><td>Gigabit</td><td>1000 Mbps</td><td>100 / 1000 = 0.1</td><td style="color:var(--coral)">1 ← rounds down!</td></tr>
+      <tr><td>10 Gigabit</td><td>10,000 Mbps</td><td>100 / 10000 = 0.01</td><td style="color:var(--coral)">1 ← same as GigE!</td></tr>
+    </table>
+
+    <div class="note note-warn">
+      <strong>The modern problem:</strong> Cost cannot go below 1 (integer). A 100 Mbps and a 10 Gbps link both get cost 1. OSPF treats them identically. Fix: raise reference bandwidth to 10,000 Mbps so all link speeds produce distinct values.
+    </div>
+
+    <div class="insight">
+      <strong>Path cost = sum of exit interface costs.</strong> Incoming interface cost is never counted — only the cost of the interface a packet leaves through. Dijkstra finds the path with the lowest total sum across all hops.
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 11 BANDWIDTH -->
+  <div class="section" id="bandwidth">
+    <div class="section-label">concept 11</div>
+    <div class="section-title">Bandwidth — What it Actually Means</div>
+
+    <div class="card">
+      <div class="card-title">Physical definition</div>
+      <p style="font-size:14px;color:var(--muted)">Bandwidth is how much data can flow through a wire <em>per second</em>. It is a measure of <strong style="color:#fff">capacity</strong> — the width of the pipe, not the speed of the water inside.</p>
+      <div class="analogy">
+        <strong>Not a pipe — a highway.</strong> 1 Mbps = dirt road (1 car/sec). 100 Mbps = 4-lane highway. 10 Gbps = an airport. All cars travel at the same speed (light). The difference is how many can travel simultaneously.
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="color:var(--teal)">What bandwidth IS</div>
+        <ul style="font-size:13px;color:var(--muted);padding-left:18px;line-height:2.2">
+          <li>More data in flight simultaneously</li>
+          <li>Larger files finish transferring faster</li>
+          <li>More concurrent connections supported</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--coral)">What bandwidth is NOT</div>
+        <ul style="font-size:13px;color:var(--muted);padding-left:18px;line-height:2.2">
+          <li>Speed of individual packets (always ~light)</li>
+          <li>Lower latency</li>
+          <li>More reliability</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note note-info">
+      <strong>What sets the speed:</strong> The slowest of three things — the cable category (Cat5e, fiber), the port hardware on each router/switch, and what both sides negotiate during auto-detection. Plug a Cat6 cable into a 100 Mbps port — you get 100 Mbps, not Cat6's potential.
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 12 AS AND ASN -->
+  <div class="section" id="asn">
+    <div class="section-label">concept 12</div>
+    <div class="section-title">Autonomous System & ASN</div>
+
+    <div class="card">
+      <div class="card-title">What an AS is</div>
+      <p style="font-size:14px;color:var(--muted)">An Autonomous System is a collection of IP networks under one organization's control that presents a <em>single routing policy</em> to the internet. Each AS gets a globally unique ASN (Autonomous System Number) from IANA.</p>
+      <div class="analogy">
+        <strong>Country code analogy:</strong> +1 = USA, +44 = UK, +91 = India. ASN is the same idea for networks. Inside your country you use local systems (OSPF). To call another country you need the country code (BGP + ASN).
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="color:var(--muted)">Home network — no AS needed</div>
+        <p style="font-size:13px;color:var(--muted)">1 public IP from ISP. 1 ISP connection. No routing control. ISP makes all decisions. You are a passenger.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--teal)">Organization — needs an AS</div>
+        <p style="font-size:13px;color:var(--muted)">Owns thousands of IPs. Connects to multiple ISPs. Needs to control routing policy. Announces its own prefixes. It drives itself.</p>
+      </div>
+    </div>
+
+    <div class="codeblock">
+<span class="c-teal">OSPF vs BGP — where each operates:</span>
+
+  [Your Company AS 65001]          [Internet — AS 7018, AS 15169...]
+  ┌─────────────────────┐
+  │   OSPF runs here    │──ASBR──BGP──→ other ASes
+  │   (inside your AS)  │
+  └─────────────────────┘
+
+  OSPF = knows every router inside your building
+  BGP  = knows only which ASes advertise which prefixes
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Final mental model summary -->
+  <div class="section">
+    <div class="section-label">the big picture</div>
+    <div class="section-title">One Mental Model to Rule Them All</div>
+
+    <div class="card">
+      <div class="analogy" style="border-color:var(--amber);font-size:15px;line-height:1.9;color:var(--text)">
+        Imagine a country (the AS). Inside it are states (areas). Each state has its own road map (LSDB). State officials (Internal routers) only know their state's roads. The governor's office (ABR) sits on the state border — it knows both the state roads and the national highway (Area 0) and sends short summaries across the border, never the full state road map. The immigration officer (ASBR) handles everything coming in from foreign countries (external ASes). The federal highway (Area 0) must always exist, always be connected, and all states must connect to it — never directly to each other.
+        <br><br>
+        Every road has a cost (OSPF cost). Wider roads (higher bandwidth) cost less to use. The GPS (Dijkstra) always routes through the cheapest total path.
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;margin-top:60px;padding-top:30px;border-top:1px solid var(--border)">
+    NSSA 241 · Professor Willis · Week 11 · OSPF with Multiple Areas
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1 @@
+in a competitive market deadweight loss is zero
